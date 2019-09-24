@@ -14,7 +14,7 @@
     "react.js"
   ],
   "author": "Yue Marvin Tao",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "mutated": "0.0.6",
     "prop-types": "^15.7.2",
@@ -30,5 +30,16 @@
     "babel-loader": "^8.0.6",
     "react-svg-loader": "^3.0.3",
     "url-loader": "^2.1.0"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marvintau/formwell.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marvintau/formwell/issues"
+  },
+  "homepage": "https://github.com/marvintau/formwell#readme"
 }
