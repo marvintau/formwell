@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
 	entry: {
-		'dist/formwell.dist': './src/Formwell.js',
+		'dist/index': './src/Formwell.js',
 		'test/app.dist' : './test/App.js'
 	},
 	output: {

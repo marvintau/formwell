@@ -2,8 +2,8 @@ import React from 'react';
 import {render} from 'react-dom';
 
 import Formwell from '../src/Formwell';
-import {genLex, extendEntries, randRange} from './utils';
 
+import {genLex, extendEntries, randRange} from './utils';
 const {List, Group, Record, Header} = require('mutated');
 
 let options = genLex(50)
@@ -18,6 +18,14 @@ let options = genLex(50)
 
 options.unshift(new Record({entry: 'None'}))
 
+let colsAttr = new Header(
+    {colKey: 'entry', colDesc: '条目编号', cellType:'Display', dataType:'String', expandControl: true, cellStyle: 'display'},
+    {colKey: 'accrual', colDesc: '发生额', cellType:'Display', dataType:'Number', cellStyle: 'display'},
+    {colKey: 'corrCategory', colDesc: '条目类别', cellType: 'CascadeSelect', options: options, displayKey: 'entry', cellStyle: 'display'},
+    {colKey: 'editControl', cellType: 'EditControl', cellStyle: 'control'}
+)
+
+
 let lex = genLex(30);
 let data = new List(0), annual, month;
 for (let i = 0; i < 5; i++){
@@ -31,8 +39,18 @@ for (let i = 0; i < 5; i++){
     data.push(...annual);
 }
 
+let subData = data.slice(0, 10);
+
+for (let i = 0; i < data.length; i++){
+    data[i].tabs = {
+        colsAttr,
+        data: subData,
+        tableAttr: {},
+    }
+}
+
 data = data
-.grip(((e) => e.get('year')), '年')
+.grip(((e) => e.get('year')), '年', 'tabs')
 .iter((k, v) => {
     return v
     .grip(((e) => e.get('month')), '月')
@@ -50,13 +68,6 @@ data = data
 
 console.log(data);
 
-let colsAttr = new Header(
-    {colKey: 'entry', colDesc: '条目编号', cellType:'Display', dataType:'String', expandControl: true},
-    {colKey: 'accrual', colDesc: '发生额', cellType:'Display', dataType:'Number'},
-    {colKey: 'corrCategory', colDesc: '条目类别', cellType: 'CascadeSelect', options: options, displayKey: 'entry'},
-    {colKey: 'editControl', cellType: 'EditControl', border: 'right-hide'}
-)
-
 class App extends React.Component {
 
     render(){
@@ -66,18 +77,31 @@ class App extends React.Component {
             editable: true
         }
 
-        let rowsProps = {
+        let props = {
             data,
             colsAttr,
             tableAttr,
-            displayType: 'tabs'
+        }
+
+        let stringify = (data) => {
+            let res = data;
+            if (res.constructor === Group){
+                res = res.vals().map(e => stringify(e))
+                res = res.flat();
+            } else if (res.constructor === List){
+                res = res.map(e => stringify(e));
+                res = res.flat();
+                // res = Object.values(data.cols).join(' ');
+            } else if (res.constructor === Record){
+                res = Object.values(res.cols).join(' ')
+            }
+            return res;
         }
 
         return (
             <div style={{flex: true}}>
-                <table>
-                    <tbody><Formwell.Tabs {...rowsProps}/></tbody>
-                </table>
+                <Formwell {...props}/>
+                <button onClick={() => console.log(stringify(data).join('\n'))}>export</button>
             </div>
         )
     }

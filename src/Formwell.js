@@ -1,9 +1,8 @@
-import Cell from './Cell/Cell';
-import Row from './Table/Row';
-import Rows from './Table/Rows'
+import React from 'react';
 import Tabs from './Group/Tabs'
 
-export default {
-    Rows,
-    Tabs
+export default function Formwell ({data, tableAttr, colsAttr}) {
+    return <table>
+        <tbody><Tabs data={data} tableAttr={tableAttr} colsAttr={colsAttr}/></tbody>
+    </table>
 }

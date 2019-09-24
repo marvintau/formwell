@@ -35,9 +35,11 @@ export default class Tabs extends React.Component {
 
     constructor(props){
         super(props);
+        console.log(props);
+        let currKey = props.data.constructor === Group ? props.data.keys()[0] : undefined;
 
         this.state = {
-            currKey : props.data.keys()[0]
+            currKey
         }
     }
 
@@ -88,18 +90,24 @@ export default class Tabs extends React.Component {
 
     render(){
 
-        let {data, colsAttr, tableAttr, displayType='paginator'} = this.props;
+        let {data, colsAttr, tableAttr} = this.props;
         
-        let colsLength = colsAttr.filter(e => e.border !== 'right-hide').length;
+        if (data.constructor === List){
+            return [<Head {...this.props} key={'head'}/>, <Rows {...this.props} key={'table'}/>]
+        }
+
+        let colsLength = colsAttr.filter(e => e.cellStyle === 'display').length;
+
+        let tabStyle = data.tabStyle ? data.tabStyle : 'paginator';
 
         let controller;
-        if(displayType === 'paginator'){
+        if(tabStyle === 'paginator'){
             controller = <TabTR key={'ctrl'}><td colSpan={colsLength}><TabTD>
                 <Button onClick={() => this.prevKey()}>前一{data.desc}</Button>
                 <div>当前第{this.state.currKey}{data.desc}</div>
                 <Button onClick={() => this.nextKey()}>后一{data.desc}</Button>
             </TabTD></td></TabTR>
-        } else if (displayType === 'tabs') {
+        } else if (tabStyle === 'tabs') {
 
             let keys = data.keys().map((e, i) => {
                 let displayed = e === this.state.currKey ? <b>{e}</b> : e;

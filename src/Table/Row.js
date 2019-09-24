@@ -3,8 +3,13 @@ import styled from 'styled-components';
 
 import Cell from '../Cell/Cell';
 import Rows from './Rows';
+import Formwell from '../Formwell';
 
 const TR = styled.tr`
+`
+
+const TDTab = styled.td`
+    margin: 10px;
 `
 
 export default class Row extends React.Component {
@@ -58,7 +63,7 @@ export default class Row extends React.Component {
         let {data, hovered, expanded} = this.state,
             {expandable} = tableAttr;
 
-        expandable = expandable && data.subs.length > 0;
+        expandable = expandable && (data.subs.length || data.tabs !== undefined) > 0;
 
         let cols = colsAttr.map((colAttr, colIndex) => {
             let {colKey} = colAttr;
@@ -78,12 +83,21 @@ export default class Row extends React.Component {
         
         let subs = [];
         if(expanded){
-            subs = <Rows key={'rest'}
-                level={level+1}
-                data={data.subs}
-                colsAttr={colsAttr}
-                tableAttr={tableAttr}
-            />
+            if(data.subs.length > 0){
+                subs = <Rows key={'rest'}
+                    level={level+1}
+                    data={data.subs}
+                    colsAttr={colsAttr}
+                    tableAttr={tableAttr}
+                />
+            } else if (data.tabs !== undefined){
+
+                let colsWidth = colsAttr.filter(e => e.cellStyle === 'display').length;
+
+                subs = <TR key={'rest'}>
+                    <TDTab colSpan={colsWidth}><Formwell {...data.tabs} /></TDTab>
+                </TR>
+            }
         }
 
         let tr = <TR key={'first'}

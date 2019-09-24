@@ -9,19 +9,15 @@ const TD = styled.td`
     height: 28px;
     vertical-align: middle;
     line-height: 1.5em;
-    ${({border='full'}) => ({
-        'left-hide' : 'border-right: 1px solid black;',
-        'right-hide' : 'border-left: 1px solid black;',
-        'full': 'border: 1px solid black;'
-    }[border])}
+    ${({cellStyle='display'}) => ({
+        'control' : 'border-left: 1px solid black;',
+        'display': 'border: 1px solid black;'
+    }[cellStyle])}
     
-    ${({border='full', hovered}) => {
-        if (border==='full'){
-            return hovered ? `background: #E3C08E;` : '';
-        } else if (border==='right-hide') {
-            return hovered ? '' : '& *{opacity: 0;}'
-        }
-    }}
+    ${({cellStyle='display', hovered}) => ({
+        display: hovered ? `background: #E3C08E;` : '',
+        control: hovered ? '' : '& *{opacity: 0;}'
+    }[cellStyle])}
 `
 
 const Indenter = styled.div`

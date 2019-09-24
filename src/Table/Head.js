@@ -21,7 +21,7 @@ export default class Head extends React.Component{
     render(){
         let {colsAttr} = this.props;
 
-        let headElem = colsAttr.filter(e => e.border !== 'right-hide').map(({colDesc}, index) => {
+        let headElem = colsAttr.filter(e => e.cellStyle === 'display').map(({colDesc}, index) => {
             return <TD key={index}>{colDesc}</TD>
         })
 
