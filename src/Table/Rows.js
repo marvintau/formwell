@@ -40,7 +40,7 @@ export default class Rows extends React.PureComponent {
     updateRows = (operation, args) => {
         
         if (operation === 'insert') {
-            args.push(this.props.colsAttr.makeRecord());
+            args.push(this.props.head.makeRecord());
         }
 
         this.setState({
@@ -61,7 +61,7 @@ export default class Rows extends React.PureComponent {
     }
 
     render(){
-        let {colsAttr, tableAttr, level} = this.props;
+        let {head, tableAttr, level} = this.props;
         let {data} = this.state;
 
         return data.map((entry, rowIndex) => {
@@ -71,7 +71,7 @@ export default class Rows extends React.PureComponent {
                 level={level}
                 data={entry}
                 tableAttr={tableAttr}
-                colsAttr={colsAttr}
+                head={head}
                 updateRowExpanded={this.updateExpanded}
                 updateRows={this.updateRows}
                 rowsExpanded={this.state.expanded}

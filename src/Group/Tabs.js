@@ -90,13 +90,13 @@ export default class Tabs extends React.Component {
 
     render(){
 
-        let {data, colsAttr, tableAttr} = this.props;
+        let {data, head, tableAttr} = this.props;
         
         if (data.constructor === List){
             return [<Head {...this.props} key={'head'}/>, <Rows {...this.props} key={'table'}/>]
         }
 
-        let colsLength = colsAttr.filter(e => e.cellStyle === 'display').length;
+        let colsLength = head.filter(e => e.cellStyle === 'display').length;
 
         let tabStyle = data.tabStyle ? data.tabStyle : 'paginator';
 
@@ -126,7 +126,7 @@ export default class Tabs extends React.Component {
         let props = {
             level: 0,
             data: content,
-            colsAttr,
+            head,
             tableAttr
         }
     

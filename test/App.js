@@ -18,7 +18,7 @@ let options = genLex(50)
 
 options.unshift(new Record({entry: 'None'}))
 
-let colsAttr = new Header(
+let head = new Header(
     {colKey: 'entry', colDesc: '条目编号', cellType:'Display', dataType:'String', expandControl: true, cellStyle: 'display'},
     {colKey: 'accrual', colDesc: '发生额', cellType:'Display', dataType:'Number', cellStyle: 'display'},
     {colKey: 'corrCategory', colDesc: '条目类别', cellType: 'CascadeSelect', options: options, displayKey: 'entry', cellStyle: 'display'},
@@ -43,7 +43,7 @@ let subData = data.slice(0, 10);
 
 for (let i = 0; i < data.length; i++){
     data[i].tabs = {
-        colsAttr,
+        head,
         data: subData,
         tableAttr: {},
     }
@@ -77,7 +77,7 @@ class App extends React.Component {
 
         let props = {
             data,
-            colsAttr,
+            head,
             tableAttr,
         }
 

@@ -1,6 +1,6 @@
 {
   "name": "formwell",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "clear and elegant interactive forms",
   "main": "./dist/index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "author": "Yue Marvin Tao",
   "license": "MIT",
   "dependencies": {
-    "mutated": "0.0.10",
+    "mutated": "0.0.11",
     "prop-types": "^15.7.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",

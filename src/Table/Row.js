@@ -58,14 +58,14 @@ export default class Row extends React.Component {
 
     render(){
 
-        let {rowIndex, level, colsAttr, tableAttr={}, rowsExpanded} = this.props;
+        let {rowIndex, level, head, tableAttr={}, rowsExpanded} = this.props;
         
         let {data, hovered, expanded} = this.state,
             {expandable} = tableAttr;
 
         expandable = expandable && (data.subs.length || data.tabs !== undefined) > 0;
 
-        let cols = colsAttr.map((colAttr, colIndex) => {
+        let cols = head.map((colAttr, colIndex) => {
             let {colKey} = colAttr;
             return <Cell
                 key={colIndex}
@@ -87,12 +87,12 @@ export default class Row extends React.Component {
                 subs = <Rows key={'rest'}
                     level={level+1}
                     data={data.subs}
-                    colsAttr={colsAttr}
+                    head={head}
                     tableAttr={tableAttr}
                 />
             } else if (data.tabs !== undefined){
 
-                let colsWidth = colsAttr.filter(e => e.cellStyle === 'display').length;
+                let colsWidth = head.filter(e => e.cellStyle === 'display').length;
 
                 subs = <TR key={'rest'}>
                     <TDTab colSpan={colsWidth}><Formwell {...data.tabs} /></TDTab>

@@ -19,9 +19,9 @@ const TD = styled.td`
 export default class Head extends React.Component{
 
     render(){
-        let {colsAttr} = this.props;
+        let {head} = this.props;
 
-        let headElem = colsAttr.filter(e => e.cellStyle === 'display').map(({colDesc}, index) => {
+        let headElem = head.filter(e => e.cellStyle === 'display').map(({colDesc}, index) => {
             return <TD key={index}>{colDesc}</TD>
         })
 

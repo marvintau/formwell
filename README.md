@@ -31,9 +31,9 @@ Formwell是一个用来显示表格的React Component。
 * `expandable` : 是否允许展开下一级
 * `editable` : 是否允许编辑
 
-**`colsAttr`**
+**`head`**
 
-表格每列的信息，内容至关重要。`colsAttr`是个`List`，其中包含的元素均为`Object`。每个Object包含以下内容:
+表格每列的信息，内容至关重要。`head`是个`List`，其中包含的元素均为`Object`。每个Object包含以下内容:
 
 * `colKey` : 与`Record`中的字段名对应。
 * `colDesc` : 字段名的解释，会作为表头显示出来
@@ -47,6 +47,10 @@ Formwell是一个用来显示表格的React Component。
     * `SingleSelect`
     单选
     * `CascadeSelect`
-    级联多选，下一个单选的选项依赖上一个已选的选项
+    级联多选，下一个单选的选项依赖上一个已选的选项。
+    * `options`
+    单选/级联多选时采用，选项，也是一个List of Records。
+    * `displayKey`
+    单选/级联多选时采用，在`options`中要显示的字段
 * `cellStyle`：字段样式
 目前只区分`display`和`control`，即正常显示的表格单元格，与表格右侧悬停才出现的工具栏。
