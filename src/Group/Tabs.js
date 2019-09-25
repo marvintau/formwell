@@ -35,7 +35,7 @@ export default class Tabs extends React.Component {
 
     constructor(props){
         super(props);
-        console.log(props);
+
         let currKey = props.data.constructor === Group ? props.data.keys()[0] : undefined;
 
         this.state = {

@@ -56,8 +56,6 @@ export default class Rows extends React.PureComponent {
         if(newExpanded.length === expanded.length){
             newExpanded.push(rowIndex);
         }
-        console.log(newExpanded, 'rows expand')
-
 
         this.setState({expanded: newExpanded, fromInside: true});
     }

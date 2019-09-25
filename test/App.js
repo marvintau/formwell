@@ -66,8 +66,6 @@ data = data
     })
 })
 
-console.log(data);
-
 class App extends React.Component {
 
     render(){
