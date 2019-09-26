@@ -8,6 +8,8 @@ module.exports = {
 	output: {
 		path: path.resolve(__dirname),
 		filename: '[name].js',
+		library: 'formwell',
+		libraryTarget: 'umd'
 	},
 	module: {
 		rules: [
