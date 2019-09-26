@@ -92,53 +92,54 @@ export default class Tabs extends React.Component {
 
         let {data, head, tableAttr} = this.props;
         
+        console.log(data, head, 'received by Formwell Tabs');
+
         if (data.constructor === List){
             return [<Head {...this.props} key={'head'}/>, <Rows {...this.props} key={'table'}/>]
-        }
-
-        let colsLength = head.filter(e => e.cellStyle === 'display').length;
-
-        let tabStyle = data.tabStyle ? data.tabStyle : 'paginator';
-
-        let controller;
-        if(tabStyle === 'paginator'){
-            controller = <TabTR key={'ctrl'}><td colSpan={colsLength}><TabTD>
-                <Button onClick={() => this.prevKey()}>前一{data.desc}</Button>
-                <div>当前第{this.state.currKey}{data.desc}</div>
-                <Button onClick={() => this.nextKey()}>后一{data.desc}</Button>
-            </TabTD></td></TabTR>
-        } else if (tabStyle === 'tabs') {
-
-            let keys = data.keys().map((e, i) => {
-                let displayed = e === this.state.currKey ? <b>{e}</b> : e;
-                return <Button key={i} onClick={() => this.setCurrKey(e)}>{displayed}</Button>
-            })
-
-            controller = <TabTR key={'ctrl'}><td colSpan={colsLength}><TabTD>
-                <Button onClick={() => this.prevKey()}>前一{data.desc}</Button>
-                {keys}
-                <Button onClick={() => this.nextKey()}>后一{data.desc}</Button>
-            </TabTD></td></TabTR>
-        }
-
-        let content = data.get(this.state.currKey);
-
-        let props = {
-            level: 0,
-            data: content,
-            head,
-            tableAttr
-        }
+        } else {
+            let colsLength = head.filter(e => e.cellStyle === 'display').length;
+            let tabStyle = data.tabStyle ? data.tabStyle : 'paginator';
     
-        let subLevel;
-        if (content.constructor === List){
-            subLevel = [<Head {...props} key={'head'}/>, <Rows {...props} key={'table'}/>]
-        } else if (content.constructor === Group){
-            subLevel = <Tabs {...props} key={`group-${content.desc}`}/>
+            let controller;
+            if(tabStyle === 'paginator'){
+                controller = <TabTR key={'ctrl'}><td colSpan={colsLength}><TabTD>
+                    <Button onClick={() => this.prevKey()}>前一{data.desc}</Button>
+                    <div>当前第{this.state.currKey}{data.desc}</div>
+                    <Button onClick={() => this.nextKey()}>后一{data.desc}</Button>
+                </TabTD></td></TabTR>
+            } else if (tabStyle === 'tabs') {
+    
+                let keys = data.keys().map((e, i) => {
+                    let displayed = e === this.state.currKey ? <b>{e}</b> : e;
+                    return <Button key={i} onClick={() => this.setCurrKey(e)}>{displayed}</Button>
+                })
+    
+                controller = <TabTR key={'ctrl'}><td colSpan={colsLength}><TabTD>
+                    <Button onClick={() => this.prevKey()}>前一{data.desc}</Button>
+                    {keys}
+                    <Button onClick={() => this.nextKey()}>后一{data.desc}</Button>
+                </TabTD></td></TabTR>
+            }
+    
+            let content = data.get(this.state.currKey);
+    
+            let props = {
+                level: 0,
+                data: content,
+                head,
+                tableAttr
+            }
+        
+            let subLevel;
+            if (content.constructor === List){
+                subLevel = [<Head {...props} key={'head'}/>, <Rows {...props} key={'table'}/>]
+            } else if (content.constructor === Group){
+                subLevel = <Tabs {...props} key={`group-${content.desc}`}/>
+            }
+    
+            return [controller, subLevel]
+    
         }
-
-        return [controller, subLevel]
-
     }
 
 }

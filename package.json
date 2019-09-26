@@ -1,6 +1,6 @@
 {
   "name": "formwell",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "clear and elegant interactive forms",
   "main": "./dist/index.js",
   "scripts": {
