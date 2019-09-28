@@ -6,9 +6,8 @@ import styled from 'styled-components';
 const TD = styled.td`
     padding: 6px 5px 4px;
     min-width: 25px;
-    height: 28px;
-    vertical-align: middle;
-    line-height: 1.5em;
+    height: 25px;
+    white-space: nowrap;
     ${({cellStyle='display'}) => ({
         'control' : 'border-left: 1px solid black;',
         'display': 'border: 1px solid black;'
@@ -51,34 +50,40 @@ const Img = styled.img`
 
 export default function Cell(props){
 
-    let {tableAttr, recAttr, colAttr, toggleExpand, level} = props;
+    let {rowIndex, data, tableAttr, recAttr, colAttr, level, colSpan, toggleExpand, update} = props;
 
-    let cellProp = {...tableAttr, ...recAttr, ...colAttr};
-    
-    let expandControl;
-    if (colAttr.expandControl){
+    let cellProp = {rowIndex, data, ...tableAttr, ...recAttr, ...colAttr, colSpan, update};
+
+    let expandControlElem;
+
+    if (cellProp.expandControl){
         if (tableAttr.expandable){
             let right = <Img src={RightArrowIcon} />,
                 down  = <Img src={DownArrowIcon} />;
-            expandControl = <Control onClick={toggleExpand}>
+            expandControlElem = <Control onClick={toggleExpand}>
                 {recAttr.expanded ? down : right}
             </Control>
         } else {
-            expandControl = <Control />
+            expandControlElem = <Control />
         }
     } else {
-        expandControl = [];
+        expandControlElem = [];
     }
 
     if(cellProp.disabled){
         return <TD {...cellProp} />
     } else {
+
+        if (cellProp.cellType === undefined){
+            throw Error('You must specify the cell type in table header');
+        }
+
         let CellComp = CellComponent[cellProp.cellType];
         return <TD {...cellProp}>
             <TDWrapper>
-                {expandControl}
+                {expandControlElem}
                 <Indenter expandControl={cellProp.expandControl} level={level} />
-                <CellComp {...props}/>
+                <CellComp {...cellProp}/>
             </TDWrapper>
         </TD>
     }

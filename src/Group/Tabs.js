@@ -36,7 +36,7 @@ export default class Tabs extends React.Component {
     constructor(props){
         super(props);
 
-        let currKey = props.data.constructor === Group ? props.data.keys()[0] : undefined;
+        let currKey = props.data.keys ? props.data.keys()[0] : undefined;
 
         this.state = {
             currKey
@@ -92,9 +92,8 @@ export default class Tabs extends React.Component {
 
         let {data, head, tableAttr} = this.props;
         
-        console.log(data, head, 'received by Formwell Tabs');
-
-        if (data.constructor === List){
+        if (data.constructor.name === 'List'){
+            console.log(`Tabs, received list with length of ${data.length}`)
             return [<Head {...this.props} key={'head'}/>, <Rows {...this.props} key={'table'}/>]
         } else {
             let colsLength = head.filter(e => e.cellStyle === 'display').length;
@@ -120,7 +119,8 @@ export default class Tabs extends React.Component {
                     <Button onClick={() => this.nextKey()}>后一{data.desc}</Button>
                 </TabTD></td></TabTR>
             }
-    
+
+            console.log(data, 'tab render')
             let content = data.get(this.state.currKey);
     
             let props = {
@@ -131,9 +131,9 @@ export default class Tabs extends React.Component {
             }
         
             let subLevel;
-            if (content.constructor === List){
+            if (content.constructor.name === 'List'){
                 subLevel = [<Head {...props} key={'head'}/>, <Rows {...props} key={'table'}/>]
-            } else if (content.constructor === Group){
+            } else if (content.constructor.name === 'Group'){
                 subLevel = <Tabs {...props} key={`group-${content.desc}`}/>
             }
     

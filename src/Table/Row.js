@@ -10,6 +10,8 @@ const TR = styled.tr`
 
 const TDTab = styled.td`
     margin: 10px;
+    padding: 10px;
+    z-index: -1;
 `
 
 export default class Row extends React.Component {
@@ -63,23 +65,51 @@ export default class Row extends React.Component {
         let {data, hovered, expanded} = this.state,
             {expandable} = tableAttr;
 
-        expandable = expandable && (data.subs.length || data.tabs !== undefined) > 0;
+        expandable = expandable && (data.subs.length > 0 || data.tabs !== undefined);
 
-        let cols = head.map((colAttr, colIndex) => {
-            let {colKey} = colAttr;
-            return <Cell
-                key={colIndex}
-                level={level}
+        let cellProps = {
+            level,
+            rowIndex,
+            update: this.update,
+            toggleExpand: this.toggleExpand,
+            tableAttr: {...tableAttr, expandable}
+        }
+
+        let cols,
+            colsWidth = head.filter(e => e.cellStyle === 'display').length,
+            titleCellAttr = head.filter(attr => attr.isTitle);
+
+
+        if (titleCellAttr.length > 2){
+            throw Error('Sorry but you can have at most 1 column as title in a row');
+        }
+
+        let [colAttr] = titleCellAttr;
+
+        if (titleCellAttr.length === 1 && data.get(colAttr.colKey) && data.get(colAttr.colKey).length > 0){
+            cols = [<Cell
+                key={'title'}
                 colAttr={colAttr}
-                recAttr={{...data.attr[colKey], hovered, expanded, rowsExpanded}}
-                tableAttr={{...tableAttr, expandable}}
-                colKey={colKey}
-                rowIndex = {rowIndex}
-                data={data.get(colKey)}
-                update={this.update}
-                toggleExpand={this.toggleExpand}
-            />
-        });
+                recAttr={{...data.attr.title, hovered, expanded, rowsExpanded}}
+                colKey={'title'}
+                data={data.get('title')}
+                colSpan={colsWidth}
+                {...cellProps}
+            />]    
+        } else {
+            cols = head.map((colAttr, colIndex) => {
+                let {colKey} = colAttr;
+                return <Cell
+                    key={colIndex}
+                    colAttr={colAttr}
+                    recAttr={{...data.attr[colKey], hovered, expanded, rowsExpanded}}
+                    colKey={colKey}
+                    data={data.get(colKey)}
+                    {...cellProps}
+                />
+            });    
+        }
+
         
         let subs = [];
         if(expanded){
@@ -92,8 +122,8 @@ export default class Row extends React.Component {
                 />
             } else if (data.tabs !== undefined){
 
-                let colsWidth = head.filter(e => e.cellStyle === 'display').length;
-
+                data.tabs.tableAttr.height = 300;
+                
                 subs = <TR key={'rest'}>
                     <TDTab colSpan={colsWidth}><Formwell {...data.tabs} /></TDTab>
                 </TR>

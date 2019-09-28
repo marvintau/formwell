@@ -12,26 +12,48 @@ const Select = styled.select`
     outline: none;
 `
 
-export default function SingleSelect (props){
+export default class SingleSelect extends React.PureComponent{
 
-    let {options, displayKey, update, path} = props,
-        {data=0} = props;
+    constructor(props){
+        super(props);
+        this.state = {data: props.data};
+    }
 
-    let optionsElems = options.map((data, value)=>{
-        return <option key={value} value={value}>{data.get(displayKey)}</option>;
-    })
+    update = (e) => {
+            
+        let data = e.target.value;
 
-    // 之所以要在这里使用data-path是因为，事件触发update方法的时候，
-    // 我们可以直接从DOM中得到path。
+        let {colKey, update} = this.props;
 
-    return <Wrapper>
-        <Select
-            data-path={path.join('->')}
-            value={data}
-            onFocus={update}
-            onChange={update}
-            >{optionsElems}
-        </Select>
-    </Wrapper>
+        // calling the method from parent to change Record value
+        // Note that the parent method doesn't call setState, so
+        // that there's no auto re-rendering.
+        update('self', 'set', [colKey, data]);
+
+        this.setState({
+            data
+        })
+    }
+
+    render(){
+        let {options, displayKey, valueKey} = this.props,
+            {data} = this.state;
+
+        let optionsElems = options.map((data, index)=>{
+            let value = data.get(valueKey),
+                displayed = data.get(displayKey);
+
+            return <option key={index} value={value}>{displayed}</option>;
+        })
+
+        return <Wrapper>
+            <Select
+                value={data}
+                onFocus={this.update}
+                onChange={this.update}
+                >{optionsElems}
+            </Select>
+        </Wrapper>
+    }
 
 }

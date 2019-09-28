@@ -1,17 +1,45 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import SingleSelect from './SingleSelect';
-
 const Wrapper = styled.div`
     min-width: 100px;
     display: flex;
     flex-direction: column;
 
     & > div {
-        margin-bottom: 2px;
+        margin: 2px 0px;
     }
 `
+
+const Select = styled.select`
+    width: 100%;
+    min-width: 50px;
+    border: 1px solid black;
+    outline: none;
+`
+
+function SingleSelect (props){
+
+    let {data, options, displayKey, update, path} = props;
+
+    let optionsElems = options.map((data, index)=>{
+        return <option key={index}>{data.get(displayKey)}</option>;
+    })
+
+    // 之所以要在这里使用data-path是因为，事件触发update方法的时候，
+    // 我们可以直接从DOM中得到path。
+
+    return <Wrapper>
+        <Select
+            data-path={path.join('->')}
+            value={data}
+            onFocus={update}
+            onChange={update}
+            >{optionsElems}
+        </Select>
+    </Wrapper>
+
+}
 
 export default class CascadeSelect extends React.Component {
 
@@ -24,14 +52,16 @@ export default class CascadeSelect extends React.Component {
     }
 
     static getDerivedStateFromProps(props, state){
+
         if (props.data !== state.data){
             return { data : props.data === undefined ? '0->0' : props.data}
         }
-        return null;
+        return state;
     }
 
 
     update = (e) => {
+
         let val = e.target.value,
             path = e.target.dataset.path,
             newPath = `${path}->${val}`;
@@ -48,7 +78,7 @@ export default class CascadeSelect extends React.Component {
     renderSelect(pastPath, [curr, ...restPath], options, displayKey){
 
         // if reached the end (leaf) of the tree, return nothing.
-        if(options === undefined || Object.keys(options).length === 0){
+        if(options.length === 0){
             return [];
         }
 
@@ -56,6 +86,7 @@ export default class CascadeSelect extends React.Component {
         pastPath = pastPath.concat(curr); 
         let props = {
                 key: `${pastPath.length}-${curr}`,
+                data: curr,
                 options,
                 displayKey,
                 path: pastPath,
@@ -66,7 +97,8 @@ export default class CascadeSelect extends React.Component {
             return [<SingleSelect {...props} />];
         } else {
             let selected = restPath[0],
-                nextLevelOptions = options[selected].subs;
+                selectedOption = options.find(e => e.get(displayKey) === selected) || options[0],
+                nextLevelOptions = selectedOption.subs;
 
             Object.assign(props, {data: selected})
 
@@ -78,8 +110,7 @@ export default class CascadeSelect extends React.Component {
 
 
     render(){
-        let {colAttr} = this.props,
-            {options, displayKey} = colAttr,
+        let {options, displayKey} = this.props,
             {data} = this.state;
 
         let selects = this.renderSelect([], data.split('->'), options, displayKey);

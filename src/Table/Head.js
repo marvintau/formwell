@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const TD = styled.td`
+const TH = styled.th`
     padding: 6px 5px 4px;
     min-width: 25px;
     height: 28px;
@@ -13,6 +13,8 @@ const TD = styled.td`
     color: #FEFEFE;
     font-family: 'Pingfang SC', 'Microsoft Yahei';
     font-weight: bold;
+    position:sticky;
+    top: -1px;
 `
 
 
@@ -22,7 +24,7 @@ export default class Head extends React.Component{
         let {head} = this.props;
 
         let headElem = head.filter(e => e.cellStyle === 'display').map(({colDesc}, index) => {
-            return <TD key={index}>{colDesc}</TD>
+            return <TH key={index}>{colDesc}</TH>
         })
 
         return <tr>{headElem}</tr>

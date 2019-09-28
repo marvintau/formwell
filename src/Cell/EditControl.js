@@ -55,9 +55,7 @@ export default class EditControl extends React.Component{
     }
 
     render(){
-        let {tableAttr, recAttr} = this.props,
-            {editable} = tableAttr,
-            {expanded, rowsExpanded} = recAttr;
+        let {editable, expanded, rowsExpanded} = this.props;
 
         let move = [
             <Icon key={'create'} src={CreateRecordIcon} onClick={this.insert}/>,

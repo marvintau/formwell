@@ -83,14 +83,14 @@ class App extends React.Component {
 
         let stringify = (data) => {
             let res = data;
-            if (res.constructor === Group){
+            if (res.constructor.name === 'Group'){
                 res = res.vals().map(e => stringify(e))
                 res = res.flat();
-            } else if (res.constructor === List){
+            } else if (res.constructor.name === 'List'){
                 res = res.map(e => stringify(e));
                 res = res.flat();
                 // res = Object.values(data.cols).join(' ');
-            } else if (res.constructor === Record){
+            } else if (res.constructor.name === 'Record'){
                 res = Object.values(res.cols).join(' ')
             }
             return res;
