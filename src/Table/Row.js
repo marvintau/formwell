@@ -91,8 +91,8 @@ export default class Row extends React.Component {
                 key={'title'}
                 colAttr={colAttr}
                 recAttr={{...data.attr.title, hovered, expanded, rowsExpanded}}
-                colKey={'title'}
-                data={data.get('title')}
+                colKey={colAttr.colKey}
+                data={data.get(colAttr.colKey)}
                 colSpan={colsWidth}
                 {...cellProps}
             />]    

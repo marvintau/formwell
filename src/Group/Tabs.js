@@ -120,7 +120,6 @@ export default class Tabs extends React.Component {
                 </TabTD></td></TabTR>
             }
 
-            console.log(data, 'tab render')
             let content = data.get(this.state.currKey);
     
             let props = {

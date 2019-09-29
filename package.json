@@ -16,7 +16,7 @@
   "author": "Yue Marvin Tao",
   "license": "MIT",
   "dependencies": {
-    "mutated": "0.0.14",
+    "mutated": "0.0.15",
     "prop-types": "^15.7.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
