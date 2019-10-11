@@ -40,7 +40,7 @@ module.exports = {
 		]
 	},
 
-	mode: 'production',
+	mode: 'development',
 
 	optimization: {
 		minimizer: [

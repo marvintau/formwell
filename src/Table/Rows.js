@@ -51,7 +51,7 @@ export default class Rows extends React.PureComponent {
         })
     }
 
-    updateExpanded = (rowIndex) => {
+    updateRowsExpanded = (rowIndex) => {
 
         let {expanded} = this.state;
         let newExpanded = expanded.filter(e => e !== rowIndex);
@@ -63,7 +63,7 @@ export default class Rows extends React.PureComponent {
     }
 
     render(){
-        let {head, tableAttr, level} = this.props;
+        let {head, tableAttr, level=0} = this.props;
         let {data} = this.state;
 
         return data.map((entry, rowIndex) => {
@@ -74,8 +74,8 @@ export default class Rows extends React.PureComponent {
                 data={entry}
                 tableAttr={tableAttr}
                 head={head}
-                updateRowExpanded={this.updateExpanded}
                 updateRows={this.updateRows}
+                updateRowsExpanded={this.updateRowsExpanded}
                 rowsExpanded={this.state.expanded}
             />
         })

@@ -20,7 +20,7 @@ export default class Row extends React.Component {
         this.state = {
             data: this.props.data,
             hovered: false,
-            expanded: false,
+            isRowExpanded: false,
         };
     }
 
@@ -31,22 +31,24 @@ export default class Row extends React.Component {
         return state;
     }
 
-    update = (type, method, args) => {
+    updateRow = (type, method, args) => {
 
         if (type === 'list') {
             this.props.updateRows(method, args);
         } else if (type === 'self'){
             let {data} = this.state;
-            data[method](...args);
+            this.setState({
+                data: data[method](...args)
+            })
         }
     }
 
     toggleExpand = () => {
-        let {updateRowExpanded, rowIndex} = this.props;
-        updateRowExpanded(rowIndex);
+        let {updateRowsExpanded, rowIndex} = this.props;
+        updateRowsExpanded(rowIndex);
 
         this.setState({
-            expanded : !this.state.expanded
+            isRowExpanded : !this.state.isRowExpanded
         })
     }
 
@@ -62,70 +64,91 @@ export default class Row extends React.Component {
 
         let {rowIndex, level, head, tableAttr={}, rowsExpanded} = this.props;
         
-        let {data, hovered, expanded} = this.state,
-            {expandable} = tableAttr;
+        let {data, hovered, isRowExpanded} = this.state,
+            {expandable, controllable} = tableAttr;
 
-        expandable = expandable && (data.subs.length > 0 || data.tabs !== undefined);
+        expandable = expandable && (data.hasChild() || data.hasTable());
 
-        let cellProps = {
+        let sharedCellProps = {
             level,
-            rowIndex,
-            update: this.update,
+            update: this.updateRow,
             toggleExpand: this.toggleExpand,
-            tableAttr: {...tableAttr, expandable}
+            ...tableAttr, 
+            expandable
         }
 
-        let cols,
-            colsWidth = head.filter(e => e.cellStyle === 'display').length,
-            titleCellAttr = head.filter(attr => attr.isTitle);
+        let cols = [],
+            titleData,
+            titleColKey,
+            colsWidth = head.len();
 
-
-        if (titleCellAttr.length > 2){
-            throw Error('Sorry but you can have at most 1 column as title in a row');
+        // 检查这个column是否是否是title
+        for (let key in head) if (head[key].isTitle){
+            titleColKey = key;
+            titleData = data.get(key);
         }
 
-        let [colAttr] = titleCellAttr;
+        // 如果是title，那么cols将只包含一个cell，同时占满整个表格行。需要注意的是，
+        // 如果head中包含的title字段，在data中并不包含，或者data中包含的内容（即
+        // 字符串）是空的，那么都不会作为title来处理。
+        if (titleColKey && titleData && titleData.length > 0){
 
-        if (titleCellAttr.length === 1 && data.get(colAttr.colKey) && data.get(colAttr.colKey).length > 0){
-            cols = [<Cell
-                key={'title'}
-                colAttr={colAttr}
-                recAttr={{...data.attr.title, hovered, expanded, rowsExpanded}}
-                colKey={colAttr.colKey}
-                data={data.get(colAttr.colKey)}
-                colSpan={colsWidth}
-                {...cellProps}
-            />]    
+            let cellProps = {
+                ...sharedCellProps,
+                ...head[titleColKey],
+                hovered, isRowExpanded, rowsExpanded,
+                colKey: titleColKey,
+                data: data.get(titleColKey),
+                colSpan: colsWidth,
+                toggleExpand
+            }
+
+            cols.push(<Cell key={'title'} {...cellProps}/>)
+
         } else {
-            cols = head.map((colAttr, colIndex) => {
-                let {colKey} = colAttr;
-                return <Cell
-                    key={colIndex}
-                    colAttr={colAttr}
-                    recAttr={{...data.attr[colKey], hovered, expanded, rowsExpanded}}
-                    colKey={colKey}
-                    data={data.get(colKey)}
-                    {...cellProps}
-                />
-            });    
+
+            for (let colKey in head){
+
+                let cellProps = {
+                    ...sharedCellProps,
+                    ...head[colKey],
+                    hovered, isRowExpanded, rowsExpanded,
+                    colKey: colKey,
+                    colSpan: colsWidth,
+                    data: data.get(colKey),
+                }
+    
+                cols.push(<Cell key={colKey}{...cellProps}/>)
+            }
+
+            if (controllable){
+                cols.push(<Cell
+                    key={'ctrl'}
+                    isControlCell={true}
+                    isRowExpanded={isRowExpanded}
+                    update={this.updateRow}
+                    rowIndex={rowIndex}
+                />)
+            }
+
         }
 
         
         let subs = [];
-        if(expanded){
-            if(data.subs.length > 0){
+        if(isRowExpanded){
+            if(data.hasChild()){
                 subs = <Rows key={'rest'}
                     level={level+1}
-                    data={data.subs}
+                    data={data.heir}
                     head={head}
                     tableAttr={tableAttr}
                 />
-            } else if (data.tabs !== undefined){
+            } else if (data.hasTable()){
 
-                data.tabs.tableAttr.height = 300;
+                data.subs.tableAttr.height = 300;
                 
                 subs = <TR key={'rest'}>
-                    <TDTab colSpan={colsWidth}><Formwell {...data.tabs} /></TDTab>
+                    <TDTab colSpan={colsWidth}><Formwell {...data.subs} /></TDTab>
                 </TR>
             }
         }

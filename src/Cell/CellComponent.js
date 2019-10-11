@@ -1,17 +1,17 @@
-import Display from './Display';
+import Normal from './Normal';
 import RotateDisplay from './RotateDisplay';
 import MultiRotateDisplay from './MultiRotateDisplay';
 
 import SingleSelect from './SingleSelect';
-import CascadeSelect from './CascadeSelect';
+import SelectPath from './SelectPath';
 
 import EditControl from './EditControl';
 
 export default {
-    Display,
+    Normal,
     RotateDisplay,
     MultiRotateDisplay,
     SingleSelect,
-    CascadeSelect,
+    SelectPath,
     EditControl
 }

@@ -1,14 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import UpArrowIcon from './icons/up-arrow.png';
-import DownArrowIcon from './icons/down-arrow.png';
 import CreateRecordIcon from './icons/create-record.png';
 import DeleteRecordIcon from './icons/cross.png';
 
 const Control = styled.div`
-    min-width: 25px;
+    width: 0px;
     display: flex;
+    jusify-content: flex-end;
 `
 
 const Icon = styled.img`
@@ -25,24 +24,6 @@ const Icon = styled.img`
 
 export default class EditControl extends React.Component{
 
-    constructor(props){
-        super(props);
-
-        this.state = {
-            expanded : false
-        }
-    }
-
-    moveUp = () => {
-        let {update, rowIndex} = this.props;
-        update('list', 'swap', [rowIndex, -1]);
-    }
-
-    moveDown = () => {
-        let {update, rowIndex} = this.props;
-        update('list', 'swap', [rowIndex, 1]);
-    }
-
     remove = () => {
         console.log('remove')
         let {update, rowIndex} = this.props;
@@ -50,26 +31,19 @@ export default class EditControl extends React.Component{
     }
 
     insert = () => {
-        let {update, rowIndex} = this.props;
+        let {rowIndex, update} = this.props;
         update('list', 'insert', [rowIndex]);
     }
 
     render(){
-        let {editable, expanded, rowsExpanded} = this.props;
+        let {isRowExpanded} = this.props;
 
         let move = [
             <Icon key={'create'} src={CreateRecordIcon} onClick={this.insert}/>,
             <Icon key={'rem'} src={DeleteRecordIcon} onClick={this.remove}/>,
         ]
 
-        if (rowsExpanded.length === 0){
-            move.unshift(
-                <Icon key={'up'} src={UpArrowIcon} onClick={this.moveUp} />,
-                <Icon key={'down'} src={DownArrowIcon} onClick={this.moveDown} />
-            )
-        }
-
-        if(!editable || expanded){
+        if(isRowExpanded){
             return <Control/>
         } else {
             return <Control>

@@ -3,12 +3,15 @@ import Tabs from './Group/Tabs'
 import styled from 'styled-components';
 
 const Table = styled.table`
-    width: 100%;
+    width: 99%;
+    box-sizing:border-box;
     border-collapse: collapse;
     position: relative;
 `
 
 const TableWrapper = styled.div`
+    width: 100%;
+    box-sizing:border-box;
     background-color: #FAFCFE;
     height: ${({height=600})=>height}px;
     overflow-y: scroll;
@@ -39,18 +42,15 @@ export default function Formwell ({saveRemote, data, head, tableAttr, exportProc
         saveRemote(exportProc(data));
     }
 
-    if (head.some(e => e.cellType === undefined)){
-        throw Error('Apparently you forgot to specify the cell type in the header.');
-    }
-
     let saveButton = [];
     if(tableAttr.savable){
         saveButton = <SaveButton onClick={save}>保存</SaveButton>
     }
 
-    return <div><TableWrapper height={tableAttr.height}><Table>
-        <tbody><Tabs data={data} head={head} tableAttr={tableAttr}/></tbody>
-    </Table></TableWrapper>
-    {saveButton}
-    </div>
+    return <TableWrapper height={tableAttr.height}>
+        <Table>
+            <tbody><Tabs data={data} head={head} tableAttr={tableAttr}/></tbody>
+        </Table>
+        {saveButton}
+    </TableWrapper>
 }

@@ -17,15 +17,29 @@ const TH = styled.th`
     top: -1px;
 `
 
+const THControl = styled.th`
+    background-color: #FAFCFE;
+    position:sticky;
+    top: -1px;
+`
+
 
 export default class Head extends React.Component{
 
     render(){
-        let {head} = this.props;
+        let {head, tableAttr} = this.props;
 
-        let headElem = head.filter(e => e.cellStyle === 'display').map(({colDesc}, index) => {
-            return <TH key={index}>{colDesc}</TH>
-        })
+        let headElem = [];
+
+        for (let key in head){
+            let {colDesc} = head[key];
+            headElem.push(<TH key={key}>{colDesc}</TH>)
+        }
+
+        // 如果表格是左侧存在工具栏，那么需要新增一个空表头单元格。
+        if (tableAttr.controllable) {
+            headElem.push(<THControl key={'ctrl'}/>)
+        }
 
         return <tr>{headElem}</tr>
     }

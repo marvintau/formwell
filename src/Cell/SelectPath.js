@@ -1,8 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import CheckIcon from './icons/Check.png';
+
+const Img = styled.img`
+    margin: auto;
+    width: 25px;
+    height: 25px;
+`
+
 const Wrapper = styled.div`
     min-width: 100px;
+    margin: 0px 5px;
     display: flex;
     flex-direction: column;
 
@@ -18,12 +27,22 @@ const Select = styled.select`
     outline: none;
 `
 
+const String = styled.div`
+    font-weight: 300;
+    line-height: 25px;
+    font-family: 'Helvetica Neue', 'Pingfang SC', sans-serif;
+`
+
+const Container = styled.div`
+    width: 100%;
+`
+
 function SingleSelect (props){
 
     let {data, options, displayKey, update, path} = props;
 
     let optionsElems = options.map((data, index)=>{
-        return <option key={index}>{data.get(displayKey)}</option>;
+        return <option key={index}>{data.get(displayKey).valueOf()}</option>;
     })
 
     // 之所以要在这里使用data-path是因为，事件触发update方法的时候，
@@ -41,26 +60,39 @@ function SingleSelect (props){
 
 }
 
-export default class CascadeSelect extends React.Component {
+export default class SelectPath extends React.Component {
 
     constructor(props, context){
         super(props, context);
 
         this.state={
-            data: props.data ? props.data : "0->0"
+            editing: false,
+            data: props.data ? props.data : {path: [0, 0]}
         }
     }
 
     static getDerivedStateFromProps(props, state){
 
         if (props.data !== state.data){
-            return { data : props.data === undefined ? '0->0' : props.data}
+            return {...state, data: props.data ? props.data : {path: [0, 0]}}
         }
         return state;
     }
 
+    toggleEdit = (e) => {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        this.setState({
+            editing: !this.state.editing
+        })
+    }
 
     update = (e) => {
+
+        e.preventDefault();
+        e.stopPropagation();
 
         let val = e.target.value,
             path = e.target.dataset.path,
@@ -68,14 +100,17 @@ export default class CascadeSelect extends React.Component {
         let {colKey} = this.props;
 
         // this will call the parent method to change Record value
-        this.props.update('self', 'set', [colKey, newPath]);
+        
+        this.props.update('self', 'set', [colKey, newPath.split('->')]);
 
         this.setState({
-            data: newPath
+            data: newPath.split('->')
         })
     }
 
-    renderSelect(pastPath, [curr, ...restPath], options, displayKey){
+    renderSelect(pastPath, nextPath, options, displayKey){
+
+        let [curr, ...restPath] = nextPath;
 
         // if reached the end (leaf) of the tree, return nothing.
         if(options.length === 0){
@@ -97,8 +132,8 @@ export default class CascadeSelect extends React.Component {
             return [<SingleSelect {...props} />];
         } else {
             let selected = restPath[0],
-                selectedOption = options.find(e => e.get(displayKey) === selected) || options[0],
-                nextLevelOptions = selectedOption.subs;
+                selectedOption = options.find(e => e.get(displayKey).valueOf() === selected) || options[0],
+                nextLevelOptions = selectedOption.heir;
 
             Object.assign(props, {data: selected})
 
@@ -110,12 +145,21 @@ export default class CascadeSelect extends React.Component {
 
 
     render(){
-        let {options, displayKey} = this.props,
-            {data} = this.state;
+        let {options, displayKey, editable} = this.props,
+            {data, editing} = this.state;
 
-        let selects = this.renderSelect([], data.split('->'), options, displayKey);
-
-        return <Wrapper>{selects}</Wrapper>
+        if (editing){
+            let selects = this.renderSelect([], data.path, options, displayKey);
+            return <div style={{display: 'flex'}}>
+                <Wrapper>{selects}</Wrapper>
+                <Img key={'done'} src={CheckIcon} onClick={this.toggleEdit}/>
+            </div>
+        } else {
+            let [_, ...actualPath] = data.path
+            return <Container onDoubleClick={this.toggleEdit}>
+                {actualPath.map((e, i) => <String key={i}>{e}</String>)}
+            </Container>
+        }
     }
 
 }

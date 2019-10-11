@@ -16,7 +16,7 @@
   "author": "Yue Marvin Tao",
   "license": "MIT",
   "dependencies": {
-    "mutated": "0.0.15",
+    "persisted": "marvintau/persisted",
     "prop-types": "^15.7.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
@@ -44,5 +44,7 @@
   "bugs": {
     "url": "https://github.com/marvintau/formwell/issues"
   },
-  "homepage": "https://github.com/marvintau/formwell#readme"
+  "homepage": "https://github.com/marvintau/formwell#readme",
+
+  "mode": "development"
 }

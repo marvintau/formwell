@@ -3,17 +3,15 @@ import styled from 'styled-components';
 
 import Rows from '../Table/Rows';
 import Head from '../Table/Head';
-import {List, Group} from 'mutated';
-
 
 const TabTR = styled.tr`
-    border-top: 1px solid black !important;
     width: 100%;
     font-family: 'Optima';
     font-weight: 300;
 `
 
 const TabTD = styled.div`
+    border-top: 1px solid black !important;
 
     display: flex;
     justify-content: space-between;
@@ -93,19 +91,33 @@ export default class Tabs extends React.Component {
         let {data, head, tableAttr} = this.props;
         
         if (data.constructor.name === 'List'){
-            console.log(`Tabs, received list with length of ${data.length}`)
-            return [<Head {...this.props} key={'head'}/>, <Rows {...this.props} key={'table'}/>]
+
+            let props = {
+                level: 0,
+                data,
+                head,
+                tableAttr
+            }
+
+            return [
+                <Head {...props} key={'head'}/>,
+                <Rows {...props} key={'table'}/>
+            ]
         } else {
-            let colsLength = head.filter(e => e.cellStyle === 'display').length;
+            let colsLength = head.len();
+
+            // 如果列表左侧有工具按钮，那么tab的宽度也需要对应增加1
+            
             let tabStyle = data.tabStyle ? data.tabStyle : 'paginator';
     
-            let controller;
+            let controller=[];
+
             if(tabStyle === 'paginator'){
-                controller = <TabTR key={'ctrl'}><td colSpan={colsLength}><TabTD>
+                controller.push(<td colSpan={colsLength}><TabTD>
                     <Button onClick={() => this.prevKey()}>前一{data.desc}</Button>
                     <div>当前第{this.state.currKey}{data.desc}</div>
                     <Button onClick={() => this.nextKey()}>后一{data.desc}</Button>
-                </TabTD></td></TabTR>
+                </TabTD></td>)
             } else if (tabStyle === 'tabs') {
     
                 let keys = data.keys().map((e, i) => {
@@ -113,11 +125,11 @@ export default class Tabs extends React.Component {
                     return <Button key={i} onClick={() => this.setCurrKey(e)}>{displayed}</Button>
                 })
     
-                controller = <TabTR key={'ctrl'}><td colSpan={colsLength}><TabTD>
+                controller.push(<td colSpan={colsLength}><TabTD>
                     <Button onClick={() => this.prevKey()}>前一{data.desc}</Button>
                     {keys}
                     <Button onClick={() => this.nextKey()}>后一{data.desc}</Button>
-                </TabTD></td></TabTR>
+                </TabTD></td>)
             }
 
             let content = data.get(this.state.currKey);
@@ -131,12 +143,15 @@ export default class Tabs extends React.Component {
         
             let subLevel;
             if (content.constructor.name === 'List'){
-                subLevel = [<Head {...props} key={'head'}/>, <Rows {...props} key={'table'}/>]
+                subLevel = [
+                    <Head {...props} key={'head'}/>,
+                    <Rows {...props} key={'table'}/>
+                ]
             } else if (content.constructor.name === 'Group'){
                 subLevel = <Tabs {...props} key={`group-${content.desc}`}/>
             }
     
-            return [controller, subLevel]
+            return [<TabTR key={'ctrl'}>{controller}</TabTR>, subLevel]
     
         }
     }

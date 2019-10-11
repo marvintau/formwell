@@ -3,11 +3,22 @@ import {render} from 'react-dom';
 
 import Formwell from '../src/Formwell';
 
-import {genLex, extendEntries, randRange} from './utils';
-const {List, Group, Record, Header} = require('mutated');
+import genCols from './utils';
+const {List, Group, Record, Head} = require('persisted');
 
-let options = genLex(50)
-    .cascade(
+// ============================================================================
+
+const optionTypes = {
+    entry: 'String'
+}
+
+let optionHead = new Head(optionTypes),
+    optionGenerated = genCols(optionTypes, {length: 40});
+
+let options = optionHead.createTableFromColumnLists(optionGenerated);
+console.log(options);
+
+options = options.cascade(
         rec=>rec.get('entry').length,
         (desc, ances) => {
             let descCode = desc.get('entry'),
@@ -16,55 +27,60 @@ let options = genLex(50)
         }
     );
 
-options.unshift(new Record({entry: 'None'}))
+console.log(optionGenerated, options);
 
-let head = new Header(
-    {colKey: 'entry', colDesc: '条目编号', cellType:'Display', dataType:'String', expandControl: true, cellStyle: 'display'},
-    {colKey: 'accrual', colDesc: '发生额', cellType:'Display', dataType:'Number', cellStyle: 'display'},
-    {colKey: 'corrCategory', colDesc: '条目类别', cellType: 'CascadeSelect', options: options, displayKey: 'entry', cellStyle: 'display'},
-    {colKey: 'editControl', cellType: 'EditControl', cellStyle: 'control'}
-)
+// ============================================================================
 
-
-let lex = genLex(30);
-let data = new List(0), annual, month;
-for (let i = 0; i < 5; i++){
-    annual = [];
-    for (let j = 0; j < 12; j++){
-        month = extendEntries(lex, 'accrual', () => randRange(10, 100));
-        month = extendEntries(month, 'month', () => j);
-        annual.push(...month);
-    }
-    annual = extendEntries(annual, 'year', () => i);
-    data.push(...annual);
+const entryTypes = {
+    entry: 'String',
+    accrual: 'Float',
+    corrCategory: 'Path',
+    year: 'Integer',
+    month: 'Integer',
 }
 
-let subData = data.slice(0, 10);
+let entryHead = new Head(entryTypes);
 
-for (let i = 0; i < data.length; i++){
-    data[i].tabs = {
-        head,
-        data: subData,
-        tableAttr: {},
+function entries(entryHead, year, month){
+    let entryGenerated = genCols(entryTypes, {length: 80, cascadedOptions: options}, {year, month}),
+        entries = entryHead.createTableFromColumnLists(entryGenerated);
+    return entries;
+}
+
+let annualEntries = new List(0);
+for (let year = 2001; year < 2010; year++){
+    for (let month = 1; month <= 12; month++){
+        annualEntries.push(...entries(entryHead, year, month));
     }
 }
 
-data = data
-.grip(((e) => e.get('year')), '年', 'tabs')
-.iter((k, v) => {
-    return v
-    .grip(((e) => e.get('month')), '月')
+// ============================================================================
+
+annualEntries = annualEntries
+    .grip((e) => e.get('year'), {desc:'年', style: 'tabs'})
     .iter((k, v) => {
-        return v.cascade(
-            rec=>rec.get('entry').length,
-            (desc, ances) => {
-                let descCode = desc.get('entry'),
-                    ancesCode = ances.get('entry');
-                return descCode.slice(0, ancesCode.length).includes(ancesCode)
-            }
-        );
+        return v
+        .grip(((e) => e.get('month')), {desc:'月'})
+        .iter((k, v) => {
+            return v.cascade(
+                rec=>rec.get('entry').length,
+                (desc, ances) => {
+                    let descCode = desc.get('entry'),
+                        ancesCode = ances.get('entry');
+                    return descCode.slice(0, ancesCode.length).includes(ancesCode)
+                }
+            );
+        })
     })
-})
+
+    
+entryHead.setColProp({colDesc: '索引', isExpandToggler: true}, 'entry');
+entryHead.setColProp({colDesc: '年'}, 'year');
+entryHead.setColProp({colDesc: '对应项', options, displayKey: 'entry'}, 'corrCategory');
+entryHead.setColProp({colDesc: '月'}, 'month');
+entryHead.setColProp({colDesc: '金额', editable: true}, 'accrual');
+
+// ============================================================================
 
 class App extends React.Component {
 
@@ -72,34 +88,20 @@ class App extends React.Component {
 
         let tableAttr = {
             expandable: true,
-            editable: true
+            controllable: true,
+            sortable: true,
+            savable: true
         }
 
         let props = {
-            data,
-            head,
-            tableAttr,
-        }
-
-        let stringify = (data) => {
-            let res = data;
-            if (res.constructor.name === 'Group'){
-                res = res.vals().map(e => stringify(e))
-                res = res.flat();
-            } else if (res.constructor.name === 'List'){
-                res = res.map(e => stringify(e));
-                res = res.flat();
-                // res = Object.values(data.cols).join(' ');
-            } else if (res.constructor.name === 'Record'){
-                res = Object.values(res.cols).join(' ')
-            }
-            return res;
+            data: annualEntries,
+            head: entryHead,
+            tableAttr
         }
 
         return (
             <div style={{flex: true}}>
                 <Formwell {...props}/>
-                <button onClick={() => console.log(stringify(data).join('\n'))}>export</button>
             </div>
         )
     }
