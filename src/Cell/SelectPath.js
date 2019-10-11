@@ -33,10 +33,6 @@ const String = styled.div`
     font-family: 'Helvetica Neue', 'Pingfang SC', sans-serif;
 `
 
-const Container = styled.div`
-    width: 100%;
-`
-
 function SingleSelect (props){
 
     let {data, options, displayKey, update, path} = props;
@@ -156,9 +152,9 @@ export default class SelectPath extends React.Component {
             </div>
         } else {
             let [_, ...actualPath] = data.path
-            return <Container onDoubleClick={this.toggleEdit}>
+            return <div style={{width: '100%'}} onDoubleClick={this.toggleEdit}>
                 {actualPath.map((e, i) => <String key={i}>{e}</String>)}
-            </Container>
+            </div>
         }
     }
 

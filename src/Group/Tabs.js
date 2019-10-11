@@ -151,7 +151,7 @@ export default class Tabs extends React.Component {
                 subLevel = <Tabs {...props} key={`group-${content.desc}`}/>
             }
     
-            return [<TabTR key={'ctrl'}>{controller}</TabTR>, subLevel]
+            return [<TabTR key={`tab-${data.desc}`}>{controller}</TabTR>, subLevel]
     
         }
     }
