@@ -3,7 +3,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
 	entry: {
-		'dist/index': './src/Formwell.js',
+		'dist/index': './src/index.js',
 		'test/app.dist' : './test/App.js'
 	},
 	output: {
@@ -41,6 +41,12 @@ module.exports = {
 	},
 
 	mode: 'development',
+
+	externals: {
+		react: 'React',
+		'react-dom': 'ReactDOM',
+		'reactstrap': 'Reactstrap',
+	},
 
 	optimization: {
 		minimizer: [
