@@ -176,7 +176,7 @@ export default class Row extends React.Component {
             } else if (subsType === 'Table'){
 
                 subs = <tr style={{width: 'auto'}} key={'rest'}>
-                    <td colSpan={head.lenDisplayed()+1} style={{marginTop: '5px', width: 'auto'}}>
+                    <td colSpan={head.lenDisplayed()+1} className="subtable-wrapper">
                         <Formwell tables={data.subs} />
                     </td>
                 </tr>

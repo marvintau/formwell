@@ -10,14 +10,8 @@ const tableStyle = {
     position: 'relative',
 }
 
-const title = {
-    fontSize: '200%',
-    fontWeight: 'black',
-}
-
 const containerStyle = {
     fontSize: '87.5%',
-    margin: '10px',
 }
 
 /**
