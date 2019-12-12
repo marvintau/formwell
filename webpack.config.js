@@ -39,12 +39,12 @@ module.exports = {
 		]
 	},
 
-	mode: 'development',
+	mode: 'production',
 
 	externals: {
 		react: 'React',
 		'react-dom': 'ReactDOM',
-		'reactstrap': 'Reactstrap',
+		'reactstrap': 'reactstrap',
 	},
 
 	optimization: {
