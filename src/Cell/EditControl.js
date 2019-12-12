@@ -1,54 +1,55 @@
 import React from 'react';
-import styled from 'styled-components';
 
+import ModifyRecordIcon from './icons/modify.png';
 import CreateRecordIcon from './icons/create-record.png';
 import DeleteRecordIcon from './icons/cross.png';
+import SaveRecordIcon from './icons/check.png';
 
-const Control = styled.div`
-    width: 0px;
-    display: flex;
-    jusify-content: flex-end;
-`
-
-const Icon = styled.img`
-    width: 25px;
-    height: 25px;
-    margin: 0px 2px;
-    cursor: pointer;
-    opacity: 0.4;
-
-    &:hover {
-        opacity: 1;
-    }
-`
+const controlStyle = {
+    display: 'flex',
+    jusifyContent: 'flex-end'
+}
 
 export default class EditControl extends React.Component{
 
     remove = () => {
-        console.log('remove')
-        let {update, rowIndex} = this.props;
-        update('list', 'remove', [rowIndex]);
+        let {updateRows, rowIndex} = this.props;
+        updateRows('remove', [rowIndex]);
     }
 
     insert = () => {
-        let {rowIndex, update} = this.props;
-        update('list', 'insert', [rowIndex]);
+        let {updateRows, rowIndex} = this.props;
+        updateRows('insert', [rowIndex]);
     }
 
     render(){
-        let {isRowExpanded} = this.props;
-
-        let move = [
-            <Icon key={'create'} src={CreateRecordIcon} onClick={this.insert}/>,
-            <Icon key={'rem'} src={DeleteRecordIcon} onClick={this.remove}/>,
-        ]
-
-        if(isRowExpanded){
-            return <Control/>
-        } else {
-            return <Control>
-                {move}
-            </Control>
+        let {isRowEditing, isHovered, toggleEdit} = this.props,
+            {insertable, removable, modifiable} = this.props; 
+        
+        if (isRowEditing){
+            return <div style={controlStyle}>
+                <img className='icon' style={{opacity: '1'}} key={'save'} src={SaveRecordIcon} onClick={toggleEdit}/>
+            </div>
         }
+
+        let imgStyle = {};
+        if (isHovered) {
+            imgStyle = {opacity: 0.4}
+        }
+
+        let move = [];
+        if(insertable){
+            move.push(<img className='icon' style={imgStyle} key={'create'} src={CreateRecordIcon} onClick={this.insert}/>)
+        }
+        if(removable){
+            move.push(<img className='icon' style={imgStyle} key={'remove'} src={DeleteRecordIcon} onClick={this.remove}/>)
+        }
+        if(modifiable){
+            move.push(<img className='icon' style={imgStyle} key={'modify'} src={ModifyRecordIcon} onClick={toggleEdit}/>)
+        }
+
+        return <div style={controlStyle}>
+            {move}
+        </div>
     }
 }

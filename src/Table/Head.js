@@ -1,44 +1,59 @@
 import React from 'react';
-import styled from 'styled-components';
 
-const TH = styled.th`
-    padding: 6px 5px 4px;
-    min-width: 25px;
-    height: 28px;
-    vertical-align: middle;
-    text-align: center;
-    line-height: 1.5em;
-    border: 1px solid black;
-    background-color: #555555;
-    color: #FEFEFE;
-    font-family: 'Pingfang SC', 'Microsoft Yahei';
-    font-weight: bold;
-    position:sticky;
-    top: -1px;
-`
+const indicator = {
+    width: '25px',
+    height: '25px',
+    minWidth: '25px',
+    maxWidth: '25px',
+    background: '#555555',
+    position: 'sticky',
+    top: '-1px',
+}
 
-const THControl = styled.th`
-    background-color: #FAFCFE;
-    position:sticky;
-    top: -1px;
-`
+const headCell = {
+    // padding: "6px 5px 4px",
+    // minWidth: "25px",
+    // height: "28px",
+    textAlign: "center",
+    background: "#555555",
+    color: "#FEFEFE",
+    fontFamily: "'Pingfang SC', 'Microsoft Yahei'",
+    fontWeight: "bold",
+    position: "sticky",
+    top: "-1px",
+    userSelect: "none",
+    // cursor: "pointer",
+}
+
+
+const control = {
+    position: 'sticky',
+    top: '-1px',
+}
 
 
 export default class Head extends React.Component{
 
-    render(){
-        let {head, tableAttr} = this.props;
+    constructor(props){
+        super(props);
+    }
 
-        let headElem = [];
+    render(){
+        let {head, editable} = this.props;
+
+        let headElem = [<th style={indicator} key={'indicator'} />];
 
         for (let key in head){
-            let {colDesc} = head[key];
-            headElem.push(<TH key={key}>{colDesc}</TH>)
+            let {colDesc, hidden, isTitle} = head[key];
+
+            if(!(hidden || isTitle)){
+                headElem.push(<th style={headCell} key={key}>{colDesc}</th>)
+            }
         }
 
         // 如果表格是左侧存在工具栏，那么需要新增一个空表头单元格。
-        if (tableAttr.controllable) {
-            headElem.push(<THControl key={'ctrl'}/>)
+        if (editable) {
+            headElem.push(<th style={control} key={'ctrl'}/>)
         }
 
         return <tr>{headElem}</tr>

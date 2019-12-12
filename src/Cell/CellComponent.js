@@ -1,17 +1,11 @@
 import Normal from './Normal';
-import RotateDisplay from './RotateDisplay';
-import MultiRotateDisplay from './MultiRotateDisplay';
-
-import SingleSelect from './SingleSelect';
-import SelectPath from './SelectPath';
-
+import MultiLine from './MultiLine';
 import EditControl from './EditControl';
+import RefString from './RefString';
 
 export default {
     Normal,
-    RotateDisplay,
-    MultiRotateDisplay,
-    SingleSelect,
-    SelectPath,
-    EditControl
+    MultiLine,
+    EditControl,
+    RefString
 }

@@ -1,158 +1,181 @@
 import React from 'react';
-import styled from 'styled-components';
 
 import Rows from '../Table/Rows';
 import Head from '../Table/Head';
 
-const TabTR = styled.tr`
-    width: 100%;
-    font-family: 'Optima';
-    font-weight: 300;
-`
+import {Table} from 'persisted';
 
-const TabTD = styled.div`
-    border-top: 1px solid black !important;
+const cellStyle = {
+    padding: 0,
+    minWidth: '25px',
+    height: '25px',
+    whiteSpace: 'nowrap',
+    userSelect: 'none',
+}
 
-    display: flex;
-    justify-content: space-between;
+const tabRowStyle = {
+    height: '28px',
+    padding: '0',
+    width: "100%",
+    borderTop: '1px solid black',
+    borderBottom: '1px solid black',
+    fontFamily: "'Optima'",
+    fontWeight: "300",
+}
 
-    & div {
-        text-align: center;
-        padding: 10px;
-    }
-`
+const tabCellStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+}
 
-const Button = styled.div`
-    &:hover {
-        background-color: #DEF9F3;
-        cursor: pointer;
-    }
-`
+const tabElemStyle = {
+    textAlign: 'center',
+    padding: '10px',
+    userSelect: 'none',
+    cursor: 'pointer',
+}
 
 export default class Tabs extends React.Component {
 
     constructor(props){
         super(props);
 
-        let currKey = props.data.keys ? props.data.keys()[0] : undefined;
+        let {table} = props,
+            currKey = table.data.keys ? table.data.keys()[0] : undefined;
 
         this.state = {
+            data: table.data,
             currKey
         }
     }
 
-    static getDerivedStateFromProps(props, state){
-        if(!state.fromInside){
-            if (props.data !== state.data){
-                return {
-                    currKey: props.data.keys()[0],
-                    fromInside : false
-                }
-            }
-        } else {
-            return {...state, fromInside: false}
+    evaluate = () => {
+        let {table} = this.props;
+        if(table.constructor.name === 'WorkTable'){
+            console.log('evaluated, ateleast')
+            
+            this.setState({
+                data: table.evaluate()
+            })
         }
-        return state;
     }
 
     setCurrKey = (currKey) => {
         console.log(currKey, 'setCurrKey')
         this.setState({
             currKey,
-            fromInside: true
         })
     }
 
     prevKey = () => {
-        let keys = this.props.data.keys(),
+        let {table} = this.props,
+            keys = table.data.keys(),
             {currKey} = this.state,
             currKeyIndex = keys.indexOf(currKey),
             prevKey = keys[currKeyIndex === 0 ? 0 : currKeyIndex - 1];
 
         this.setState({
             currKey: prevKey,
-            fromInside: true
         })
     }
 
     nextKey = () => {
-        let keys = this.props.data.keys(),
+        let {table} = this.props,
+            keys = table.data.keys(),
             {currKey} = this.state,
             currKeyIndex = keys.indexOf(currKey),
             nextKey = keys[currKeyIndex === keys.length - 1 ? keys.length - 1 : currKeyIndex + 1];
         this.setState({
             currKey: nextKey,
-            fromInside: true
         })
     }
 
     render(){
 
-        let {data, head, tableAttr} = this.props;
-        
-        if (data.constructor.name === 'List'){
+        let {table, rowswiseExport} = this.props,
+            {head, attr} = table,
+            {editable, expandable, autoExpanded, rowswiseExportable} = attr,
+            {data} = this.state;
 
-            let props = {
-                level: 0,
-                data,
-                head,
-                tableAttr
-            }
+        if (data.constructor.name === 'Body'){
+
+            let props = { head, data, ...attr}
 
             return [
                 <Head {...props} key={'head'}/>,
-                <Rows {...props} key={'table'}/>
+                <Rows key={'table'}
+                    head={head}
+                    data={data}
+                    editable={editable}
+                    expandable={expandable}
+                    autoExpanded={autoExpanded}
+                    evaluate={this.evaluate}
+                    rowswiseExport={rowswiseExport}
+                    rowswiseExportable={rowswiseExportable}
+                />
             ]
-        } else {
-            let colsLength = head.len();
+        } else if( data.constructor.name === 'Tabs') {
 
             // 如果列表左侧有工具按钮，那么tab的宽度也需要对应增加1
             
             let tabStyle = data.tabStyle ? data.tabStyle : 'paginator';
     
-            let controller=[];
-
+            let controller;
             if(tabStyle === 'paginator'){
-                controller.push(<td colSpan={colsLength}><TabTD>
-                    <Button onClick={() => this.prevKey()}>前一{data.desc}</Button>
-                    <div>当前第{this.state.currKey}{data.desc}</div>
-                    <Button onClick={() => this.nextKey()}>后一{data.desc}</Button>
-                </TabTD></td>)
+                
+                controller = <td style={cellStyle} colSpan={head.lenDisplayed()+1}>
+                    <div style={tabCellStyle}>
+                        <div style={tabElemStyle}  onClick={() => this.prevKey()}>前一{data.desc}</div>
+                        <div style={tabElemStyle} >当前第{this.state.currKey}{data.desc}</div>
+                        <div style={tabElemStyle}  onClick={() => this.nextKey()}>后一{data.desc}</div>
+                    </div>
+                </td>
+
             } else if (tabStyle === 'tabs') {
     
                 let keys = data.keys().map((e, i) => {
                     let displayed = e === this.state.currKey ? <b>{e}</b> : e;
-                    return <Button key={i} onClick={() => this.setCurrKey(e)}>{displayed}</Button>
+                    return <div key={i} onClick={() => this.setCurrKey(e)}>{displayed}</div>
                 })
     
-                controller.push(<td colSpan={colsLength}><TabTD>
-                    <Button onClick={() => this.prevKey()}>前一{data.desc}</Button>
-                    {keys}
-                    <Button onClick={() => this.nextKey()}>后一{data.desc}</Button>
-                </TabTD></td>)
+                controller = <td style={{...cellStyle, width: '100%'}} colSpan={head.lenDisplayed()+1}>
+                    <div style={tabCellStyle}>
+                        <div style={tabElemStyle} onClick={() => this.prevKey()}>前一{data.desc}</div>
+                        {keys}
+                        <div style={tabElemStyle} onClick={() => this.nextKey()}>后一{data.desc}</div>
+                    </div>
+                </td> 
             }
 
             let content = data.get(this.state.currKey);
-    
-            let props = {
-                level: 0,
-                data: content,
-                head,
-                tableAttr
-            }
-        
+            
             let subLevel;
-            if (content.constructor.name === 'List'){
+            if (content.constructor.name === 'Body'){
                 subLevel = [
-                    <Head {...props} key={'head'}/>,
-                    <Rows {...props} key={'table'}/>
+                    <Head key={'head'}
+                        head={head}
+                        data={content}
+                        attr={attr}
+                    />,
+                    <Rows key={'table'}
+                        head={head}
+                        data={content}
+                        editable={editable}
+                        expandable={expandable}
+                        autoExpanded={autoExpanded}
+                        evaluate={this.evaluate}
+                        rowswiseExport={rowswiseExport}
+                        rowswiseExportable={rowswiseExportable}
+                    />
                 ]
-            } else if (content.constructor.name === 'Group'){
-                subLevel = <Tabs {...props} key={`group-${content.desc}`}/>
+            } else if (content.constructor.name === 'Tabs'){
+                subLevel = <Tabs key={`group-${this.state.currKey}-${content.desc}`}
+                    table= {new Table(head, content, attr)}
+                    rowswiseExport={rowswiseExport}
+                />
             }
     
-            return [<TabTR key={`tab-${data.desc}`}>{controller}</TabTR>, subLevel]
-    
+            return [<tr style={tabRowStyle} key={`tab-${data.desc}`}>{controller}</tr>, subLevel]
         }
     }
 
