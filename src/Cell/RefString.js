@@ -59,9 +59,23 @@ export default class RefString extends React.Component{
         super(props);
 
         this.state = {
-            string : props.data.string,
+            string: props.data.string,
             desc: props.data.desc,
-            suggestions: []
+            suggestions: [],
+            fromInner: false
+        }
+    }
+
+    static getDerivedStateFromProps(props, state){
+        if (state.fromInner){
+            console.log('yeah')
+            return {...state, fromInner: false};
+        } else {
+            return {
+                string: props.data.string,
+                desc: props.data.desc,
+                suggestions: []
+            }
         }
     }
 
@@ -99,38 +113,45 @@ export default class RefString extends React.Component{
         }
         this.props.data.string = newValue;
         this.setState({
-            string: newValue
+            string: newValue,
+            fromInner: true
         })
         console.log(this.props.data.string, 'onchange');
     }
 
     onSuggestionsFetchRequested = ({ value }) => {
         this.setState({
-            suggestions: this.getSuggestions(value)
+            suggestions: this.getSuggestions(value),
+            fromInner: true
         });
     };
     
       // Autosuggest will call this function every time you need to clear suggestions.
     onSuggestionsClearRequested = () => {
         this.setState({
-            suggestions: []
+            suggestions: [],
+            fromInner: true
         });
     };
 
     onSuggestionSelected = (e, {suggestionValue}) => {
         console.log(this.props.data.string, suggestionValue, 'onselected')
         
-        this.props.data.string += suggestionValue;
+        const truncString = this.props.data.string.replace(/(?<=[:/])([^:/]*)$/, suggestionValue);
+
+        this.props.data.string = truncString;
 
         this.setState({
-            string: this.state.string + suggestionValue
+            string: truncString,
+            fromInner: true
         });
     }
     render() {
-    
+
+        
         let {data, isRowEditing} = this.props;
         let {string, suggestions} = this.state;
-    
+        
         let res;
         if(!isRowEditing){
 
@@ -173,14 +194,15 @@ export default class RefString extends React.Component{
                     let newValue = e.target.value;
                     this.props.data.desc = newValue;
                     this.setState({
-                        desc: newValue
+                        desc: newValue,
+                        fromInner: true
                     })        
                 }}
             />
 
             res = <div style={{display: 'flex', flexDirection:'column'}}>
                 {auto}
-                {input}>
+                {input}
             </div>
         }
 
